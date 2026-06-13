@@ -601,7 +601,10 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    document.title = page === 'Home' ? `${name} — Official Site` : `${page} · ${name}`
+    document.title =
+      page === 'Home'
+        ? `${name} — Athens Jazz Fusion Band`
+        : `${page} · ${name}`
   }, [page])
 
   const go = (p) => {
@@ -615,18 +618,19 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black font-sans">
+    <div className="min-h-screen bg-white text-black font-sans flex flex-col">
       <header className="border-b-2 border-black sticky top-0 bg-white z-10">
-        <nav className="relative px-6 py-4 flex items-center justify-between sm:justify-center">
+        <nav className="relative px-6 py-3 flex items-center justify-between lg:justify-center">
           <button
             onClick={() => go('Home')}
-            className="text-2xl sm:absolute sm:left-6"
+            className="text-2xl lg:absolute lg:left-6"
             style={{ fontFamily: '"Faster One", system-ui' }}
           >
             {name}
           </button>
 
-          <div className="hidden sm:flex flex-wrap justify-center items-center gap-x-6 gap-y-2">
+          {/* Full nav — only renders when there's room for it */}
+          <div className="hidden lg:flex items-center gap-x-6">
             {pages.map((p) => (
               <button
                 key={p}
@@ -640,9 +644,10 @@ export default function App() {
             ))}
           </div>
 
+          {/* Hamburger — everything below lg */}
           <button
             onClick={() => setMenuOpen((o) => !o)}
-            className="sm:hidden flex flex-col gap-1.5 p-1"
+            className="lg:hidden flex flex-col gap-1.5 p-1"
             aria-label="Toggle menu"
             aria-expanded={menuOpen}
           >
@@ -653,7 +658,7 @@ export default function App() {
         </nav>
 
         {menuOpen && (
-          <div className="sm:hidden border-t border-neutral-200 flex flex-col">
+          <div className="lg:hidden border-t border-neutral-200 flex flex-col">
             {pages.map((p) => (
               <button
                 key={p}
@@ -670,7 +675,7 @@ export default function App() {
       </header>
 
       <main
-        className={`mx-auto px-4 sm:px-6 py-8 sm:py-12 ${
+        className={`w-full mx-auto flex-1 px-4 sm:px-6 py-8 sm:py-12 ${
           page === 'Calendar' ? 'max-w-5xl' : 'max-w-2xl'
         }`}
       >
@@ -681,6 +686,20 @@ export default function App() {
         {page === 'Stage' && <Stage />}
         {page === 'Booking' && <Booking />}
       </main>
+
+      <footer className="border-t border-neutral-200 mt-6 px-6 py-3 text-center text-xs text-neutral-500">
+        <p>
+          © {new Date().getFullYear()} {name}. Site by{' '}
+          <a
+            href="https://heyim.link/"
+            target="_blank"
+            rel="noreferrer"
+            className="underline hover:text-black"
+          >
+            Lincoln Ledet ↗
+          </a>
+        </p>
+      </footer>
     </div>
   )
 }
