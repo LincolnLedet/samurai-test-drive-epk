@@ -541,8 +541,8 @@ function Booking() {
       <h2 className="text-xs uppercase tracking-widest text-neutral-400">Booking</h2>
 
       <p className="text-base sm:text-lg leading-relaxed">
-        Want to book {name}? Reach out directly — we read every inquiry
-        and do our best to respond within a few days.
+        Want to book us? Reach out directly.
+        We do our best to respond within a few days.
       </p>
 
       <button
