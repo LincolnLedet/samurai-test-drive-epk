@@ -4,6 +4,8 @@ export const name = 'Samurai Test Drive'
 export const email = 'samuraitestdrive@gmail.com'
 export const instagramUrl = 'https://www.instagram.com/samuraitestdrive/'
 export const instagramHandle = '@samuraitestdrive'
+export const siteUrl = 'https://samuritestdrive.band'
+export const defaultEventImage = '/photos/keegannelson_samuraitestdrive-5.webp'
 
 export const shortBio =
   "Samurai Test Drive is a five-piece jazz fusion band based out of Athens, GA. Taking inspiration from artists like Casiopea, Return to Forever, Lettuce, and Jaco Pastorius, they revive the almost-forgotten sound of '80s jazz fusion."
@@ -93,6 +95,88 @@ export function formatShortDate(iso) {
   const d = new Date(iso + 'T00:00:00')
   const m = d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()
   return `${m} ${d.getDate()}`
+}
+
+// Parse "9:00 PM" → { h: 21, m: 0 }, "TBD" → null
+function parseTime(timeStr) {
+  if (!timeStr || timeStr === 'TBD') return null
+  const m = timeStr.match(/^(\d+):(\d+)\s*(AM|PM)$/i)
+  if (!m) return null
+  let h = parseInt(m[1], 10)
+  const min = parseInt(m[2], 10)
+  const isPM = m[3].toUpperCase() === 'PM'
+  if (isPM && h !== 12) h += 12
+  if (!isPM && h === 12) h = 0
+  return { h, m: min }
+}
+
+// Build a Schema.org MusicEvent suitable for Google rich results.
+// https://developers.google.com/search/docs/appearance/structured-data/event
+export function eventSchema(event) {
+  const hasVenue = event.venue && event.venue !== 'TBD'
+  const t = parseTime(event.time)
+  // Default to 8 PM when time is TBD. Athens, GA is Eastern Time.
+  const hh = String(t ? t.h : 20).padStart(2, '0')
+  const mm = String(t ? t.m : 0).padStart(2, '0')
+  // Convention: `event.date` is the night the show is BILLED for. If the
+  // clock time is between midnight and 4 AM, the actual instant is the early
+  // hours of the NEXT calendar day — bump the date so the schema lands on
+  // the right moment (e.g., a Saturday midnight set → Sunday 00:00).
+  let startDateOnly = event.date
+  if (t && t.h < 4) {
+    const d = new Date(event.date + 'T00:00:00')
+    d.setDate(d.getDate() + 1)
+    startDateOnly = d.toISOString().slice(0, 10)
+  }
+  const startDate = `${startDateOnly}T${hh}:${mm}:00-04:00`
+
+  const [locality = '', region = ''] = (event.city || '').split(',').map((s) => s.trim())
+  const address = locality || region
+    ? {
+        '@type': 'PostalAddress',
+        addressLocality: locality,
+        addressRegion: region,
+        addressCountry: 'US',
+      }
+    : undefined
+
+  const image = event.poster ? siteUrl + event.poster : siteUrl + defaultEventImage
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'MusicEvent',
+    name: `${name}${hasVenue ? ` at ${event.venue}` : ''}`,
+    description: `${name} performing live${hasVenue ? ` at ${event.venue}` : ''}${event.city ? ` in ${event.city}` : ''}.`,
+    startDate,
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    location: {
+      '@type': 'MusicVenue',
+      name: hasVenue ? event.venue : 'TBA',
+      ...(address ? { address } : {}),
+    },
+    performer: {
+      '@type': 'MusicGroup',
+      name,
+      url: siteUrl,
+    },
+    organizer: {
+      '@type': 'MusicGroup',
+      name,
+      url: siteUrl,
+    },
+    image,
+    ...(event.tickets
+      ? {
+          offers: {
+            '@type': 'Offer',
+            url: event.tickets,
+            availability: 'https://schema.org/InStock',
+            validFrom: `${event.date}T00:00:00-04:00`,
+          },
+        }
+      : {}),
+  }
 }
 
 // Stage plot — laid out on a 6-column, 2-row grid so the front row (2 items)

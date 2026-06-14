@@ -18,56 +18,6 @@ import {
 
 const pages = ['Home', 'About', 'Video', 'Calendar', 'Stage', 'Booking']
 
-const SITE_URL = 'https://samuritestdrive.band'
-
-// Injects a <script type="application/ld+json"> into <head> for the lifetime of
-// the component. Used to add page-specific Schema.org structured data.
-function JsonLd({ data }) {
-  useEffect(() => {
-    const script = document.createElement('script')
-    script.type = 'application/ld+json'
-    script.text = JSON.stringify(data)
-    document.head.appendChild(script)
-    return () => {
-      script.remove()
-    }
-  }, [data])
-  return null
-}
-
-// Build a Schema.org MusicEvent from an event row.
-function eventSchema(event) {
-  const hasVenue = event.venue && event.venue !== 'TBD'
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'MusicEvent',
-    name: `${name}${hasVenue ? ` at ${event.venue}` : ''}`,
-    startDate: `${event.date}T00:00:00`,
-    eventStatus: 'https://schema.org/EventScheduled',
-    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-    location: {
-      '@type': 'MusicVenue',
-      name: hasVenue ? event.venue : 'TBA',
-      address: event.city || '',
-    },
-    performer: {
-      '@type': 'MusicGroup',
-      name,
-      url: SITE_URL,
-    },
-    ...(event.tickets
-      ? {
-          offers: {
-            '@type': 'Offer',
-            url: event.tickets,
-            availability: 'https://schema.org/InStock',
-          },
-        }
-      : {}),
-    ...(event.poster ? { image: `${SITE_URL}${event.poster}` } : {}),
-  }
-}
-
 // Map page names to URL paths (Home lives at "/").
 const pathFor = (page) => (page === 'Home' ? '/' : `/${page.toLowerCase()}`)
 const pageFor = (pathname) => {
@@ -231,9 +181,6 @@ function Flier() {
   const [next, ...rest] = upcoming
   return (
     <div className="space-y-8 sm:space-y-10">
-      {upcoming.map((e) => (
-        <JsonLd key={e.date} data={eventSchema(e)} />
-      ))}
       <ShowFlier event={next} big />
       {rest.length > 0 && <UpcomingList shows={rest} />}
     </div>
