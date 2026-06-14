@@ -111,6 +111,28 @@ function parseTime(timeStr) {
   return { h, m: min }
 }
 
+// Add `addH` hours to a date/time, rolling the date across midnight.
+// Returns { date: 'YYYY-MM-DD', h, m }.
+function addHours(dateIso, h, m, addH) {
+  const total = h * 60 + m + addH * 60
+  const dayShift = Math.floor(total / (24 * 60))
+  const mins = ((total % (24 * 60)) + 24 * 60) % (24 * 60)
+  let date = dateIso
+  if (dayShift !== 0) {
+    const dt = new Date(dateIso + 'T00:00:00Z')
+    dt.setUTCDate(dt.getUTCDate() + dayShift)
+    date = dt.toISOString().slice(0, 10)
+  }
+  return { date, h: Math.floor(mins / 60), m: mins % 60 }
+}
+
+// Extract a numeric price from a free-text price string, e.g. "$10 at the
+// door" → "10". Returns null when no dollar amount is present.
+function parsePrice(priceStr) {
+  const m = (priceStr || '').match(/\$\s*(\d+(?:\.\d{1,2})?)/)
+  return m ? m[1] : null
+}
+
 // Build a Schema.org MusicEvent suitable for Google rich results.
 // https://developers.google.com/search/docs/appearance/structured-data/event
 export function eventSchema(event) {
@@ -119,9 +141,17 @@ export function eventSchema(event) {
   // and the date verbatim from the data — no day-shifting.
   // Default to 8 PM when doors are TBD. Athens, GA is Eastern Time.
   const t = parseTime(event.doors)
-  const hh = String(t ? t.h : 20).padStart(2, '0')
-  const mm = String(t ? t.m : 0).padStart(2, '0')
+  const startH = t ? t.h : 20
+  const startM = t ? t.m : 0
+  const hh = String(startH).padStart(2, '0')
+  const mm = String(startM).padStart(2, '0')
   const startDate = `${event.date}T${hh}:${mm}:00-04:00`
+
+  // Estimate a 3-hour set so Google has an endDate; rolls past midnight.
+  const end = addHours(event.date, startH, startM, 3)
+  const endDate = `${end.date}T${String(end.h).padStart(2, '0')}:${String(end.m).padStart(2, '0')}:00-04:00`
+
+  const price = parsePrice(event.price)
 
   const [locality = '', region = ''] = (event.city || '').split(',').map((s) => s.trim())
   const address = locality || region
@@ -141,6 +171,7 @@ export function eventSchema(event) {
     name: `${name}${hasVenue ? ` at ${event.venue}` : ''}`,
     description: `${name} performing live${hasVenue ? ` at ${event.venue}` : ''}${event.city ? ` in ${event.city}` : ''}.`,
     startDate,
+    endDate,
     eventStatus: 'https://schema.org/EventScheduled',
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     location: {
@@ -159,16 +190,16 @@ export function eventSchema(event) {
       url: siteUrl,
     },
     image,
-    ...(event.tickets
-      ? {
-          offers: {
-            '@type': 'Offer',
-            url: event.tickets,
-            availability: 'https://schema.org/InStock',
-            validFrom: `${event.date}T00:00:00-04:00`,
-          },
-        }
-      : {}),
+    // Always emit an offer so Google has the field. Falls back to the band
+    // site when ticketing isn't live yet, and includes a price when one is
+    // listed (e.g. "$10 at the door").
+    offers: {
+      '@type': 'Offer',
+      url: event.tickets || siteUrl,
+      availability: 'https://schema.org/InStock',
+      validFrom: `${event.date}T00:00:00-04:00`,
+      ...(price ? { price, priceCurrency: 'USD' } : {}),
+    },
   }
 }
 
