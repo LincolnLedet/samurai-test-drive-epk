@@ -42,7 +42,7 @@ export const photos = [
 //                                       the UI swaps "Get Tickets" → "More info soon".
 export const events = [
   {
-    date: '2026-06-27',
+    date: '2026-06-26',
     time: '12:00 AM',
     doors: '9:00 PM',
     venue: 'Live Wire',
