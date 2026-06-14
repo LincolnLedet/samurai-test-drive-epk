@@ -71,7 +71,7 @@ export const events = [
     support: 'with The While and Argo and the Violet Queens',
     price: '$10 at the door',
     tickets: '',
-    poster: '/posters/nowhere-bar-2026-08-03.webp',
+    poster: '/posters/argo.jpg',
   },
 ]
 
