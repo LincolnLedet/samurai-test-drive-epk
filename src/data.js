@@ -114,21 +114,13 @@ function parseTime(timeStr) {
 // https://developers.google.com/search/docs/appearance/structured-data/event
 export function eventSchema(event) {
   const hasVenue = event.venue && event.venue !== 'TBD'
-  const t = parseTime(event.time)
-  // Default to 8 PM when time is TBD. Athens, GA is Eastern Time.
+  // Use the door time (when the audience arrives) for the schema's startDate,
+  // and the date verbatim from the data — no day-shifting.
+  // Default to 8 PM when doors are TBD. Athens, GA is Eastern Time.
+  const t = parseTime(event.doors)
   const hh = String(t ? t.h : 20).padStart(2, '0')
   const mm = String(t ? t.m : 0).padStart(2, '0')
-  // Convention: `event.date` is the night the show is BILLED for. If the
-  // clock time is between midnight and 4 AM, the actual instant is the early
-  // hours of the NEXT calendar day — bump the date so the schema lands on
-  // the right moment (e.g., a Saturday midnight set → Sunday 00:00).
-  let startDateOnly = event.date
-  if (t && t.h < 4) {
-    const d = new Date(event.date + 'T00:00:00')
-    d.setDate(d.getDate() + 1)
-    startDateOnly = d.toISOString().slice(0, 10)
-  }
-  const startDate = `${startDateOnly}T${hh}:${mm}:00-04:00`
+  const startDate = `${event.date}T${hh}:${mm}:00-04:00`
 
   const [locality = '', region = ''] = (event.city || '').split(',').map((s) => s.trim())
   const address = locality || region
