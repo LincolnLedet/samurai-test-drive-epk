@@ -64,13 +64,14 @@ export const events = [
   },
   {
     date: '2026-08-03',
-    time: 'TBD',
-    doors: 'TBD',
+    time: '9:30 PM',
+    doors: '8:30 PM',
     venue: 'Nowhere Bar',
     city: 'Athens, GA',
-    support: '',
-    price: 'TBD',
+    support: 'with The While and Argo and the Violet Queens',
+    price: '$10 at the door',
     tickets: '',
+    poster: '/posters/nowhere-bar-2026-08-03.webp',
   },
 ]
 
