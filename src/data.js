@@ -54,13 +54,14 @@ export const events = [
   },
   {
     date: '2026-07-23',
-    time: 'TBD',
-    doors: 'TBD',
+    time: '9:30 PM',
+    doors: '7:00 PM',
     venue: 'Nowhere Bar',
     city: 'Athens, GA',
-    support: 'with Krikos',
+    support: 'with Kirkos',
     price: 'TBD',
     tickets: '',
+    poster: '/posters/kirkos-2026-07-23.webp',
   },
   {
     date: '2026-08-03',
@@ -71,7 +72,7 @@ export const events = [
     support: 'with The While and Argo and the Violet Queens',
     price: '$10 at the door',
     tickets: '',
-    poster: '/posters/argo.jpg',
+    poster: '/posters/argo.webp',
   },
 ]
 
