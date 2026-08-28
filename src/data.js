@@ -74,6 +74,38 @@ export const events = [
     tickets: '',
     poster: '/posters/argo.webp',
   },
+  {
+    date: '2026-09-10',
+    time: '8:00 PM',
+    doors: 'TBD',
+    venue: 'Flicker Theatre & Bar',
+    city: 'Athens, GA',
+    support: 'Support TBD',
+    price: 'TBD',
+    tickets: '',
+  },
+  {
+    date: '2026-09-11',
+    time: '7:00 PM',
+    doors: '6:00 PM',
+    venue: "Hendershot's",
+    city: 'Athens, GA',
+    support:
+      'Catalyst Showcase — with Quentin Love, UseYourWords, Little Mae, Almost Always, and The Midknighters',
+    price: '$10 at the door',
+    tickets: '',
+    poster: '/posters/catalyst-showcase-2026-09-11.webp',
+  },
+  {
+    date: '2026-09-24',
+    time: '8:00 PM',
+    doors: 'TBD',
+    venue: 'Flicker Theatre & Bar',
+    city: 'Athens, GA',
+    support: 'with Organically Programmed',
+    price: 'TBD',
+    tickets: '',
+  },
 ]
 
 // Helper: format ISO date to a long human string.
