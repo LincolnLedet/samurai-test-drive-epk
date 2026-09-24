@@ -108,13 +108,15 @@ export const events = [
   },
   {
     date: '2026-09-24',
-    time: '8:00 PM',
-    doors: 'TBD',
+    time: '9:00 PM',
+    doors: '8:00 PM',
     venue: 'Flicker Theatre & Bar',
     city: 'Athens, GA',
-    support: 'with Organically Programmed',
-    price: 'TBD',
-    tickets: '',
+    support: 'with Organically Programmed and Ben Hackett',
+    price: '$10',
+    tickets:
+      'https://flickertheatre.freshtix.com/events/organically-programmed--samurai-test-drive--ben-hackett',
+    poster: '/posters/flicker-2026-09-24.webp',
   },
   {
     date: '2026-10-28',
